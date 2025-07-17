@@ -32,6 +32,7 @@ pub fn build(b: *std.Build) void {
 
     const is_linux = target.result.os.tag == .linux;
     const is_windows = target.result.os.tag == .windows;
+    const is_macos = target.result.os.tag == .macos;
 
     const config = b.addConfigHeader(.{
         .style = .{ .cmake = upstream.path("build/cmake/config.h.in") },
@@ -124,7 +125,7 @@ pub fn build(b: *std.Build) void {
         .HAVE_FSETXATTR = true,
         .HAVE_FSTAT = true,
         .HAVE_FSTATAT = true,
-        .HAVE_FSTATFS = true,
+        .HAVE_FSTATFS = !is_macos,
         .HAVE_FSTATVFS = true,
         .HAVE_FTRUNCATE = true,
         .HAVE_FUTIMENS = true,
@@ -143,8 +144,8 @@ pub fn build(b: *std.Build) void {
         .HAVE_GMTIME_R = !is_windows,
         .HAVE_GMTIME_S = null,
         .HAVE_GRP_H = !is_windows,
-        .HAVE_ICONV = !is_windows,
-        .HAVE_ICONV_H = !is_windows,
+        .HAVE_ICONV = is_linux,
+        .HAVE_ICONV_H = is_linux,
         .HAVE_INTTYPES_H = true,
         .HAVE_IO_H = null,
         .HAVE_LANGINFO_H = !is_windows,
@@ -265,8 +266,8 @@ pub fn build(b: *std.Build) void {
         .HAVE_SIGACTION = true,
         .HAVE_SIGNAL_H = true,
         .HAVE_SPAWN_H = true,
-        .HAVE_STATFS = true,
-        .HAVE_STATVFS = true,
+        .HAVE_STATFS = !is_macos,
+        .HAVE_STATVFS = !is_windows,
         .HAVE_STAT_EMPTY_STRING_BUG = null,
         .HAVE_STDARG_H = true,
         .HAVE_STDINT_H = true,
@@ -295,7 +296,7 @@ pub fn build(b: *std.Build) void {
         .HAVE_STRUCT_STAT_ST_MTIMESPEC_TV_NSEC = null,
         .HAVE_STRUCT_STAT_ST_MTIME_N = null,
         .HAVE_STRUCT_STAT_ST_MTIME_USEC = null,
-        .HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC = !is_windows,
+        .HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC = is_linux,
         .HAVE_STRUCT_STAT_ST_UMTIME = null,
         .HAVE_STRUCT_TM_TM_GMTOFF = !is_windows,
         .HAVE_STRUCT_TM___TM_GMTOFF = null,
@@ -316,10 +317,10 @@ pub fn build(b: *std.Build) void {
         .HAVE_SYS_QUEUE_H = true,
         .HAVE_SYS_RICHACL_H = null,
         .HAVE_SYS_SELECT_H = true,
-        .HAVE_SYS_STATFS_H = true,
+        .HAVE_SYS_STATFS_H = is_linux,
         .HAVE_SYS_STATVFS_H = true,
         .HAVE_SYS_STAT_H = !is_windows,
-        .HAVE_SYS_SYSMACROS_H = true,
+        .HAVE_SYS_SYSMACROS_H = is_linux,
         .HAVE_SYS_TIME_H = true,
         .LIBATTR_PKGCONFIG_VERSION = "0.0.0", // TODO
         .LIBACL_PKGCONFIG_VERSION = "0.0.0", // TODO
@@ -374,7 +375,7 @@ pub fn build(b: *std.Build) void {
         .LSTAT_FOLLOWS_SLASHED_SYMLINK = true,
         .LT_OBJDIR = ".libs/",
         .MAJOR_IN_MKDEV = null,
-        .MAJOR_IN_SYSMACROS = !is_windows,
+        .MAJOR_IN_SYSMACROS = is_linux,
         .NTDDI_VERSION = null,
         .PACKAGE = "libarchive",
         .PACKAGE_BUGREPORT = "libarchive--discuss@googlegroups.com",
@@ -577,7 +578,7 @@ pub fn build(b: *std.Build) void {
     }
 
     if (target.result.os.tag == .macos) {
-        lib.linkFramework("CommonCrypto");
+        lib.linkFramework("CoreServices");
     }
 
     lib.root_module.addConfigHeader(config);

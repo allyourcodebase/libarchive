@@ -24,3 +24,5 @@ const bzip_dependency = b.dependency("libarchive", .{
 your_exe.linkLibrary(bzip_dependency.artifact("archive"));
 ```
 
+## Note
+Cross compiling to MacOS requires CoreServices.
